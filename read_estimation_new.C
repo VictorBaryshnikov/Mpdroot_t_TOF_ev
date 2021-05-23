@@ -74,7 +74,7 @@ R__ADD_INCLUDE_PATH($VMCWORKDIR)
  * 
  */
 
-int read_estimation_new(TString inFile = "mpddst_tof_method_t_ev_10000_plug.root") 
+int read_estimation_new(TString inFile = "new_mpddst_tof_method_t_ev_5831_plug.root") 
 {
 
     //.........................................................................................................................................
@@ -121,10 +121,13 @@ int read_estimation_new(TString inFile = "mpddst_tof_method_t_ev_10000_plug.root
 
     TH2F* h8 = (TH2F*)RootFileIn->Get("h8");//для nsigma: eff(number of elements of intetval)
     TH2F* h9 = (TH2F*)RootFileIn->Get("h9");//для nsigma: eff(number of elements of tofmatching: N_tofmatching)
-
+/*
     TH2F* h_pi_nsigma = (TH2F*)RootFileIn->Get("h_pi_nsigma");//если nsigma<3 то отмечаем пион на плоте m^2[GeV^2](momentum, GeV/c)
     TH2F* h_k_nsigma = (TH2F*)RootFileIn->Get("h_k_nsigma");//если nsigma<3 то отмечаем каон на плоте m^2[GeV^2](momentum GeV/c)
     TH2F* h_p_nsigma = (TH2F*)RootFileIn->Get("h_p_nsigma");//если nsigma<3 то отмечаем протон на плоте m^2[GeV^2](momentum GeV/c)
+*/
+    TH2F* nsigma_k_pi = (TH2F*)RootFileIn->Get("nsigma_k_pi"); // (nsigma_k_pi; p_t)
+    TH2F* nsigma_p_k = (TH2F*)RootFileIn->Get("nsigma_p_k"); // (nsigma_p_k; p_t)
 
 
 //...................................   estimation of efficiency of particle determination
@@ -369,6 +372,40 @@ int read_estimation_new(TString inFile = "mpddst_tof_method_t_ev_10000_plug.root
     h9->SetTitle("estimation of efficiency for nsigma(number of elements of tofmatching)");
     Canvas_nsigma->cd(2)->Update();
 
+//...................................   separation abilities of Pi, K and p
+    auto Canvas_nsigma_p_t = new TCanvas("separation abilities of Pi, K and p", "separation abilities of Pi, K and p");
+    Canvas_nsigma_p_t->Divide(1,2);
+
+    Canvas_nsigma_p_t->cd(1);
+    gStyle->SetGridColor(kGray);
+    Canvas_nsigma_p_t->cd(1)->SetGrid();
+    nsigma_k_pi->SetMarkerColor(4); //Blue
+    nsigma_k_pi->SetMarkerStyle(8); //круг
+    nsigma_k_pi->SetMarkerSize(0.3);
+    nsigma_k_pi->Draw();
+    nsigma_k_pi->GetYaxis()->SetTitle("nsigma_K_Pi");
+    nsigma_k_pi->GetXaxis()->SetTitle("momentum_t, GeV/c");
+    nsigma_k_pi->GetYaxis()->SetLabelSize(0.05);
+    nsigma_k_pi->GetXaxis()->SetLabelSize(0.05);
+    nsigma_k_pi->SetTitle("separation abilities of Pi and K");
+    Canvas_nsigma_p_t->cd(1)->Update();
+    
+    Canvas_nsigma_p_t->cd(2); 
+    gStyle->SetGridColor(kGray);
+    Canvas_nsigma_p_t->cd(2)->SetGrid();
+    nsigma_p_k->SetMarkerColor(3); //Green
+    nsigma_p_k->SetMarkerStyle(5); //крест - каон
+    nsigma_p_k->SetMarkerSize(0.3);
+    nsigma_p_k->Draw();
+    nsigma_p_k->GetYaxis()->SetTitle("nsigma_p_K");
+    nsigma_p_k->GetXaxis()->SetTitle("momentum_t, GeV/c");
+    nsigma_p_k->GetYaxis()->SetLabelSize(0.05);
+    nsigma_p_k->GetXaxis()->SetLabelSize(0.05);
+    nsigma_p_k->SetTitle("separation abilities of K and p");
+    Canvas_nsigma_p_t->cd(2)->Update();
+
+
+/*
 //...................................   nsigma < 3: m^2[GeV^2](momentum, GeV/c) for Pi, K, proton
     auto Canvas_m2_p = new TCanvas("m^2(momentum) for Pi, K, p", "m^2(momentum) for Pi, K, p");
     Canvas_m2_p->Divide(1,1);
@@ -399,7 +436,7 @@ int read_estimation_new(TString inFile = "mpddst_tof_method_t_ev_10000_plug.root
     h_k_nsigma->Draw("same"); // "same"
     h_p_nsigma->Draw("same");
     Canvas_m2_p->cd(1)->Update();
-
+*/
 /*
     Canvas_m2_p->cd(1); 
     gStyle->SetGridColor(kGray);
