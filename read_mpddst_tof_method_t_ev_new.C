@@ -92,7 +92,7 @@ R__ADD_INCLUDE_PATH($VMCWORKDIR)
  */
 //mpddst_1000.root     mpddst_probparticles.root<-вот здесь нет листьев timeEv
 //.........................................................................................................................................
-int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TString outFile = "mpddst_tof_method_t_ev_10000_plug.root", Int_t nStartEvent = 0, Int_t nEvents4Read = 5831)// 5831
+int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TString outFile = "new_mpddst_tof_method_t_ev_5831_plug.root", int nStartEvent = 0, int nEvents4Read = 5831)// 5831
 {
 
     //  для гистограммы........................................................................................................................
@@ -116,10 +116,13 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
 
     auto h8 = new TH2F("h8", "", 21, 0, 21, 20, 0, 1); //для nsigma: eff(number of elements of intetval)
     auto h9 = new TH2F("h9", "", 300, 0, 300, 20, 0, 1); //для nsigma: eff(number of elements of tofmatching: N_tofmatching)
-
+/*
     auto h_pi_nsigma = new TH2F("h_pi_nsigma", "", 300, 0, 3, 300, 0, 3); //если nsigma>3 то отмечаем пион на плоте m^2[GeV^2](momentum, GeV/c)
     auto h_k_nsigma = new TH2F("h_k_nsigma", "", 300, 0, 3, 300, 0, 3); //если nsigma>3 то отмечаем каон на плоте m^2[GeV^2](momentum GeV/c)
     auto h_p_nsigma = new TH2F("h_p_nsigma", "", 300, 0, 3, 300, 0, 3); //если nsigma>3 то отмечаем протон на плоте m^2[GeV^2](momentum GeV/c)
+*/
+    auto nsigma_k_pi = new TH2F("nsigma_k_pi", "", 300, 0, 3, 300, 0, 300); // (nsigma_k_pi; p_t)
+    auto nsigma_p_k = new TH2F("nsigma_p_k", "", 300, 0, 3, 300, 0, 300); // (nsigma_p_k; p_t)
     //.........................................................................................................................................
 
     // load libries for mpd
@@ -187,111 +190,111 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
     printf("Total number of events = %lld; read %d events from %d to %d\n", nEvents, nEvents4Read - nStartEvent, nStartEvent, nEvents4Read);
 
     //
-    Double_t timeEvSigma = 0.050; // Uncertainties of timeEv, gaus sigma [ns]
+    double  timeEvSigma = 0.050; // Uncertainties of timeEv, gaus sigma [ns]
 
     //
-    Double_t timeSigma = 0.060; // Uncertainties of time, gaus sigma [ns]
+    double  timeSigma = 0.060; // Uncertainties of time, gaus sigma [ns]
     
     //
-    Double_t speed_light = TMath::C() * pow(10, -7); //29.9792458;  // [cm/nc]
+    double  speed_light = TMath::C() * pow(10, -7); //29.9792458;  // [cm/nc]
 
 
     // гипотезы масс
     /*
-    Double_t M_e_ = 0.511/1000; // [GeV] -
-    Double_t M_u = 105.6583745/1000; // [GeV] -
-    Double_t M_pi = 139.57/1000; // [GeV]
-    Double_t M_K = 493.7/1000; // [GeV]
-    Double_t M_proton = 938.27/1000; // [GeV]
-    Double_t M_deuteron = 1875.612/1000; // [GeV]
+    double  M_e_ = 0.511/1000; // [GeV] -
+    double  M_u = 105.6583745/1000; // [GeV] -
+    double  M_pi = 139.57/1000; // [GeV]
+    double  M_K = 493.7/1000; // [GeV]
+    double  M_proton = 938.27/1000; // [GeV]
+    double  M_deuteron = 1875.612/1000; // [GeV]
     */
 
     // гипотезы в виде pdgCode
-    Int_t pdg_photon = 22;       // photon
-    Int_t pdg_anti_neutron = -2112;    // anti-neutron
-    Int_t pdg_e = -11;      // e+
-    Int_t pdg_anti_Lambda = -3122;    // anti-Lambda
-    Int_t pdg_e_ = 11;       // e-
-    Int_t pdg_Sigma_ = -3222;    // Sigma- 
-    Int_t pdg_e_neutrino = 12;       // e-neutrino (NB: flavour undefined by Geant)
-    Int_t pdg_anti_Sigma0 = -3212;    // anti Sigma0 
-    Int_t pdg_mu = -13;      // mu+
-    Int_t pdg_Sigma_PB = -3112;    // Sigma+ (PB)*/
-    Int_t pdg_mu_ = 13;       // mu-
-    Int_t pdg_anti_Xi0 = -3322;    // anti Xi0
-    Int_t pdg_pi0 = 111;      // pi0
-    Int_t pdg_Xi = -3312;    // Xi+
-    Int_t pdg_pi = 211;      // pi+
-    Int_t pdg_Omega = -3334;    // Omega+ (PB)
-    Int_t pdg_pi_ = -211;     // pi-
-    Int_t pdg_tau = -15;      // tau+
-    Int_t pdg_K_long = 130;      // K long
-    Int_t pdg_tau_ = 15;       // tau-
-    Int_t pdg_K = 321;      // K+
-    Int_t pdg_D = 411;      // D+
-    Int_t pdg_K_ = -321;     // K-
-    Int_t pdg_D_ = -411;     // D-
-    Int_t pdg_neutron = 2112;     // n
-    Int_t pdg_D0 = 421;      // D0
-    Int_t pdg_proton = 2212;     // p
-    Int_t pdg_anti_D0 = -421;     // anti D0
-    Int_t pdg_anti_proton = -2212;    // anti-proton
-    Int_t pdg_Ds = 431;      // Ds+
-    Int_t pdg_K_short = 310;      // K short
-    Int_t pdg_anti_Ds_ = -431;     // anti Ds-
-    Int_t pdg_eta = 221;      // eta
-    Int_t pdg_Lamba_c = 4122;     // Lamba_c+
-    Int_t pdg_Lambda = 3122;     // Lambda
-    Int_t pdg_W = 24;       // W+
-    Int_t pdg_Sigma = 3222;     // Sigma+
-    Int_t pdg_W_ = -24;      // W-
-    Int_t pdg_Sigma0 = 3212;     // Sigma0
-    Int_t pdg_Z = 23;       // Z
-    Int_t pdg_Sigma_PB_ = 3112;     // Sigma- (PB)/
-    Int_t pdg_deuteron = 0;        // deuteron ????
-    Int_t pdg_Xi0 = 3322;     // Xi0
-    Int_t pdg_triton = 0;        // triton
-    Int_t pdg_Xi_ = 3312;     // Xi-
-    Int_t pdg_alpha = 0;        // alpha
-    Int_t pdg_Omega_ = 3334;     // Omega- (PB)
-    Int_t pdg_K0 = 311; // K0
-    Int_t pdg_anti_K0 = -311; // anti-K0
-    // Int_t pdg_undefined = 0;        // G nu ? PDG ID 0 is undefined
+    int pdg_photon = 22;       // photon
+    int pdg_anti_neutron = -2112;    // anti-neutron
+    int pdg_e = -11;      // e+
+    int pdg_anti_Lambda = -3122;    // anti-Lambda
+    int pdg_e_ = 11;       // e-
+    int pdg_Sigma_ = -3222;    // Sigma- 
+    int pdg_e_neutrino = 12;       // e-neutrino (NB: flavour undefined by Geant)
+    int pdg_anti_Sigma0 = -3212;    // anti Sigma0 
+    int pdg_mu = -13;      // mu+
+    int pdg_Sigma_PB = -3112;    // Sigma+ (PB)*/
+    int pdg_mu_ = 13;       // mu-
+    int pdg_anti_Xi0 = -3322;    // anti Xi0
+    int pdg_pi0 = 111;      // pi0
+    int pdg_Xi = -3312;    // Xi+
+    int pdg_pi = 211;      // pi+
+    int pdg_Omega = -3334;    // Omega+ (PB)
+    int pdg_pi_ = -211;     // pi-
+    int pdg_tau = -15;      // tau+
+    int pdg_K_long = 130;      // K long
+    int pdg_tau_ = 15;       // tau-
+    int pdg_K = 321;      // K+
+    int pdg_D = 411;      // D+
+    int pdg_K_ = -321;     // K-
+    int pdg_D_ = -411;     // D-
+    int pdg_neutron = 2112;     // n
+    int pdg_D0 = 421;      // D0
+    int pdg_proton = 2212;     // p
+    int pdg_anti_D0 = -421;     // anti D0
+    int pdg_anti_proton = -2212;    // anti-proton
+    int pdg_Ds = 431;      // Ds+
+    int pdg_K_short = 310;      // K short
+    int pdg_anti_Ds_ = -431;     // anti Ds-
+    int pdg_eta = 221;      // eta
+    int pdg_Lamba_c = 4122;     // Lamba_c+
+    int pdg_Lambda = 3122;     // Lambda
+    int pdg_W = 24;       // W+
+    int pdg_Sigma = 3222;     // Sigma+
+    int pdg_W_ = -24;      // W-
+    int pdg_Sigma0 = 3212;     // Sigma0
+    int pdg_Z = 23;       // Z
+    int pdg_Sigma_PB_ = 3112;     // Sigma- (PB)/
+    int pdg_deuteron = 0;        // deuteron ????
+    int pdg_Xi0 = 3322;     // Xi0
+    int pdg_triton = 0;        // triton
+    int pdg_Xi_ = 3312;     // Xi-
+    int pdg_alpha = 0;        // alpha
+    int pdg_Omega_ = 3334;     // Omega- (PB)
+    int pdg_K0 = 311; // K0
+    int pdg_anti_K0 = -311; // anti-K0
+    // int pdg_undefined = 0;        // G nu ? PDG ID 0 is undefined
 
     // гипотезы масс
     TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(pdg_e_);
-    Double_t M_e_ = particle->Mass();  // particle mass in GeV -
+    double  M_e_ = particle->Mass();  // particle mass in GeV -
 
     particle = TDatabasePDG::Instance()->GetParticle(pdg_mu_);
-    Double_t M_mu_ = particle->Mass();  // particle mass in GeV - 
+    double  M_mu_ = particle->Mass();  // particle mass in GeV - 
 
     particle = TDatabasePDG::Instance()->GetParticle(pdg_pi);
-    Double_t M_pi = particle->Mass();  // particle mass in GeV 
+    double  M_pi = particle->Mass();  // particle mass in GeV 
 
     particle = TDatabasePDG::Instance()->GetParticle(pdg_K); 
-    Double_t M_K = particle->Mass();  // particle mass in GeV 
+    double  M_K = particle->Mass();  // particle mass in GeV 
 
     particle = TDatabasePDG::Instance()->GetParticle(pdg_proton);
-    Double_t M_proton = particle->Mass();  // particle mass in GeV 
+    double  M_proton = particle->Mass();  // particle mass in GeV 
 
     //почему то выдает массу дейтрона как 0
     particle = TDatabasePDG::Instance()->GetParticle(pdg_deuteron);
-    Double_t M_deuteron = particle->Mass();  // particle mass in GeV 
+    double  M_deuteron = particle->Mass();  // particle mass in GeV 
     M_deuteron  = 1875.612/1000; // [GeV]
 
     cout << "\n" << endl;
 
-    Double_t M_i[] = { M_pi, M_K, M_proton}; // i = pi, K, proton|     deuteron; , M_deuteron
-    Int_t Pdg_i[] = { pdg_pi, pdg_K, pdg_proton}; // i = pi, K, proton|        , deuteron; , pdg_deuteron
-    string Name_i[] = { "pi", "K", "proton"}; // , "deuteron"
+    double  M_i[] = { M_pi, M_K, M_proton}; // i = pi, K, proton|          deuteron; , M_deuteron
+    int Pdg_i[] = { pdg_pi, pdg_K, pdg_proton}; // i = pi, K, proton|             deuteron; , pdg_deuteron
+    string Name_i[] = { "pi", "K", "proton"}; //
 
-    Int_t sizeM_i = sizeof(M_i) / sizeof(Double_t);
-    Int_t sizePdg_i = sizeof(Pdg_i) / sizeof(Int_t);
+    int sizeM_i = sizeof(M_i) / sizeof(double);
+    int sizePdg_i = sizeof(Pdg_i) / sizeof(int);
     printf("size M_i: %d\n", sizeM_i);
     printf("size Pdg_i: %d\n", sizePdg_i);
     printf("\n");
 
-    for (Int_t ii = 0; ii < sizeM_i; ii++)
+    for (int ii = 0; ii < sizeM_i; ii++)
     {
     cout << "M_["<<Name_i[ii]<<", "<<ii<<"]: "<< M_i[ii]*1000 <<", MeV; " << "Pdg_["<<Name_i[ii]<<", "<<ii<<"]: "<< Pdg_i[ii] <<";"<< endl;
     }
@@ -331,9 +334,10 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
     int photons = 0;
     int ions = 0;
 
-    vector<TSIGMA> TSIGMA_n;
-    //TSIGMA_n.reserve(nEvents4Read - nStartEvent);
-    Int_t involved = 0;
+    // вектора для хранения информации об индентифицированных Pi, K, p для изучения разделительной способности метода
+    vector<AFP> array_pi;
+    vector<AFP> array_k;
+    vector<AFP> array_p;
 
     //main loop over events in the tree
     for (Long64_t iEv = nStartEvent; iEv < nEvents4Read; iEv++) {
@@ -353,18 +357,18 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
         cout << "Event# " << iEv << endl;
 
         //Кол.во сметченных треков в кажом ивенте
-        Int_t old_N_tofmatching = tofmatching->GetEntriesFast();
+        int old_N_tofmatching = tofmatching->GetEntriesFast();
 
         // проверка N_tofmatching / 50 (целочисленное) ->индекс таймера.  Запуск таймера[индекс таймера]
-        Int_t Index_timers = Int_t(old_N_tofmatching / 50);
+        int Index_timers = Int_t(old_N_tofmatching / 50);
         timers[Index_timers].Start();
  
         if (old_N_tofmatching > 0)
         {//НАЧАЛО old_N_tofmatching
         
-        Int_t skipping = 0;
+        int skipping = 0;
         // loop over tofmatching array для того что бы выкинуть неинтересующие/невозможные треки
-        for (Int_t i = 0; i < old_N_tofmatching; i++) 
+        for (int i = 0; i < old_N_tofmatching; i++) 
         {
             total_particles = total_particles + 1;
       
@@ -376,46 +380,46 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
             //int			GetKFTrackIndex(void)const{ return fKFTrackIndex;};
             // эта строчка говорит нам что у объекта класса "MpdTofMatchingData" есть метод "GetKFTrackIndex" который возвращает нам целочисленное значение типа int
             // это число есть номер в масиве треков. трек под этим номером использовался для метчинга
-            Int_t TrackIndex = Matching->GetKFTrackIndex();
+            int TrackIndex = Matching->GetKFTrackIndex();
 
             //из массива треков вытаскиваем трек, индекс которого нашли в сметченном хите
             MpdTpcKalmanTrack *track = (MpdTpcKalmanTrack*) tpckalmantrack->UncheckedAt(TrackIndex);
 
             //из метченного хита вытаскиваем индекс tof хита (в массиве треков)
-            Int_t HitIndex = Matching->GetTofHitIndex();
+            int HitIndex = Matching->GetTofHitIndex();
 
             //из массива треков вытаскиваем хит, индекс которого нашли в сметченном хите
             MpdTofHit *Hit = (MpdTofHit*) tofhit->UncheckedAt(HitIndex);
 
             //из хита вытаскиваем RefIndex
-            Int_t RefIndex = Hit->GetRefIndex();
+            int RefIndex = Hit->GetRefIndex();
 
             //из массива треков вытаскиваем mctrack, RefIndex которого нашли в хите
             MpdMCTrack *MCtrack = (MpdMCTrack*) mctrack->UncheckedAt(RefIndex);
 
             //из трека вытаскиваем импульс
-            Double_t p = track->Momentum(); //Gev/c
+            double  p = track->Momentum(); //Gev/c
             
             //из трека вытаскиваем информацию о частица/античастица?
-            Int_t charge = track->Charge(); //1 - частица, -1 - античастица
+            int charge = track->Charge(); //1 - частица, -1 - античастица
 
             //из MCtrack вытаскиваем MotherId нашего трека 
-            Int_t MotherId = MCtrack->GetMotherId();
+            int MotherId = MCtrack->GetMotherId();
 
             //из MCtrack вытаскиваем PdgCode нашего трека 
-            Int_t PdgCode = MCtrack->GetPdgCode();
+            int PdgCode = MCtrack->GetPdgCode();
 
             //берем время начала события
-            Double_t timeEv = Hit->GetTimeEv();
+            double  timeEv = Hit->GetTimeEv();
 
             //берем время пролета частицы
-            Double_t time = Hit->GetTime(); //[nc]
+            double  time = Hit->GetTime(); //[nc]
 
             //берем длину трэка (всего) 
-            Double_t length = Matching->GetTrackLength(); //[cm]
+            double  length = Matching->GetTrackLength(); //[cm]
 
-            //Double_t M_prop = p*sqrt(pow(((time - timeEv)*speed_light/length),2) - 1);
-            Double_t M_prop_2 = p*p*abs(pow(((time - timeEv)*speed_light/length),2) - 1);
+            //double  M_prop = p*sqrt(pow(((time - timeEv)*speed_light/length),2) - 1);
+            double  M_prop_2 = p*p*abs(pow(((time - timeEv)*speed_light/length),2) - 1);
 
                                                     //                pi0                     K0                      
 //D0                   Sigma0                    other                           ion                  photon           
@@ -436,7 +440,7 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
            
         }//end loop over tofmatching array для того что бы выкинуть неинтересующие/невозможные треки
 
-        Int_t N_tofmatching = old_N_tofmatching - skipping;
+        int N_tofmatching = old_N_tofmatching - skipping;
 
         cout <<"\nold_N_tofmatching = " << old_N_tofmatching << "; N_tofmatching = old_N_tofmatching -  skipping = " << N_tofmatching << "; skipping = " << skipping << ";" << endl;
 
@@ -450,32 +454,32 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
         skipping = 0;
 
         //массив timeExp_i и timeExpSigma_i для каждого сметченного хита при разных гипотезах масс
-        Double_t** timeExp_i =  new Double_t *[N_tofmatching]; // [i]{0, 0, 0, 0, 0, 0};  //[nc]
-        Double_t** timeExpSigma_i =  new Double_t *[N_tofmatching]; // [i]{0, 0, 0, 0, 0, 0}; //[nc]
+        double** timeExp_i =  new double  *[N_tofmatching]; // [i]{0, 0, 0, 0, 0, 0};  //[nc]
+        double** timeExpSigma_i =  new double  *[N_tofmatching]; // [i]{0, 0, 0, 0, 0, 0}; //[nc]
 
         //массив SigmaPID2_i nSigmaTOF_i для каждого сметченного хита при разных гипотезах масс
-        Double_t* SigmaPID2_i =  new Double_t [N_tofmatching];
-        Double_t* nSigmaTOF_i =  new Double_t [N_tofmatching];
+        double* SigmaPID2_i =  new double  [N_tofmatching];
+        double* nSigmaTOF_i =  new double  [N_tofmatching];
 
         //двумерный массив весов для сметченных трэков в выбранном ивенте
-        Double_t** Weight_i = new Double_t *[N_tofmatching]; 
+        double** Weight_i = new double  *[N_tofmatching]; 
 
         //двумерный массив для сметченных трэков в выбранном ивенте [i][0] = индекс сметченного трэка, [i][1] = p - импульс сметченного трэка, [i]21] = pSigma - сигма импульса сметченного трэка 
-        Double_t** Data_n = new Double_t *[N_tofmatching]; 
+        double** Data_n = new double  *[N_tofmatching]; 
 
         //массив упрощенных гипотез (2 гипотезы) масс для каждого сметченного трека в ивенте
-        Double_t** Mass_i = new Double_t *[N_tofmatching];
+        double** Mass_i = new double  *[N_tofmatching];
 
         //массив упрощенных гипотез (2 гипотезы) пдг кодов для упрощенных гипотез (2 гипотезы) масс для каждого сметченного трека в ивенте
-        Int_t** Pdg_Code_i = new Int_t *[N_tofmatching];
+        int** Pdg_Code_i = new int *[N_tofmatching];
  
         //время пролета частицы для каждого сметченного трэка
-        Double_t* time_n = new Double_t [N_tofmatching];
+        double* time_n = new double  [N_tofmatching];
 
-        Int_t step_matching = 0;
+        int step_matching = 0;
 
         // loop over tofmatching array
-        for (Int_t i = 0; i < old_N_tofmatching; i++) // cout i для проверки выхода за N_tofmatching 
+        for (int i = 0; i < old_N_tofmatching; i++) // cout i для проверки выхода за N_tofmatching 
         {
 
             //берем один элемент из массива сметченных хитов
@@ -486,49 +490,52 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
             //int			GetKFTrackIndex(void)const{ return fKFTrackIndex;};
             // эта строчка говорит нам что у объекта класса "MpdTofMatchingData" есть метод "GetKFTrackIndex" который возвращает нам целочисленное значение типа int
             // это число есть номер в масиве треков. трек под этим номером использовался для метчинга
-            Int_t TrackIndex = Matching->GetKFTrackIndex();
+            int TrackIndex = Matching->GetKFTrackIndex();
 
             //из массива треков вытаскиваем трек, индекс которого нашли в сметченном хите
             MpdTpcKalmanTrack *track = (MpdTpcKalmanTrack*) tpckalmantrack->UncheckedAt(TrackIndex);
 
             //из метченного хита вытаскиваем индекс tof хита (в массиве треков)
-            Int_t HitIndex = Matching->GetTofHitIndex();
+            int HitIndex = Matching->GetTofHitIndex();
 
             //из массива треков вытаскиваем хит, индекс которого нашли в сметченном хите
             MpdTofHit *Hit = (MpdTofHit*) tofhit->UncheckedAt(HitIndex);
 
             //из хита вытаскиваем RefIndex
-            Int_t RefIndex = Hit->GetRefIndex();
+            int RefIndex = Hit->GetRefIndex();
 
             //из массива треков вытаскиваем mctrack, RefIndex которого нашли в хите
             MpdMCTrack *MCtrack = (MpdMCTrack*) mctrack->UncheckedAt(RefIndex);
 
             //из трека вытаскиваем импульс
-            Double_t p = track->Momentum(); //Gev/c
+            double  p = track->Momentum(); //Gev/c
+            
+            //из трека вытаскиваем поперечный импульс
+            double  p_t = track->Pt(); //Gev/c
             
             //из трека вытаскиваем информацию о частица/античастица?
-            Int_t charge = track->Charge(); //1 - частица, -1 - античастица
+            int charge = track->Charge(); //1 - частица, -1 - античастица
 
             //из MCtrack вытаскиваем MotherId нашего трека и сохраняем его в массив Data_n
-            Int_t MotherId = MCtrack->GetMotherId();
+            int MotherId = MCtrack->GetMotherId();
 
             //из MCtrack вытаскиваем PdgCode нашего трека и сохраняем его в массив Data_n
-            Int_t PdgCode = MCtrack->GetPdgCode();
+            int PdgCode = MCtrack->GetPdgCode();
 
             //берем время начала события
-            Double_t timeEv = Hit->GetTimeEv();
+            double  timeEv = Hit->GetTimeEv();
 
             //для time_ev (детектор T0) (number of elements of tofmatching: N_tofmatching)
             h5->Fill(N_tofmatching, timeEv);
 
             //берем время пролета частицы
-            Double_t time = Hit->GetTime(); //[nc]
+            double  time = Hit->GetTime(); //[nc]
 
             //берем длину трэка (всего) 
-            Double_t length = Matching->GetTrackLength(); //[cm]
-            Double_t lengthSigma = 1; //cm, можно считать что сигма вычисления длины стремится к 0, но нам нужно зазадать какой нибудь минимум что бы корректно вычислять t_exp_sigma
+            double  length = Matching->GetTrackLength(); //[cm]
+            double  lengthSigma = 1; //cm, можно считать что сигма вычисления длины стремится к 0, но нам нужно зазадать какой нибудь минимум что бы корректно вычислять t_exp_sigma
 
-            Double_t M_prop_2 = p*p*abs(pow(((time - timeEv)*speed_light/length),2) - 1);
+            double  M_prop_2 = p*p*abs(pow(((time - timeEv)*speed_light/length),2) - 1);
 
                                                     //                pi0                     Xi0                      
 //D0                   Sigma0                    other                           ion                  photon           
@@ -542,25 +549,25 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
             time_n[step_matching] = time;          
 
             //двумерный массив весов для упрощенных гипотез масс сметченных трэков
-            Weight_i[step_matching] = new Double_t [2];
+            Weight_i[step_matching] = new double  [2];
 
             //массив timeExp_i и timeExpSigma_i для каждого сметченного хита для упрощенных гипотезах масс
-            timeExp_i[step_matching] = new Double_t [2];
-            timeExpSigma_i[step_matching] = new Double_t [2];
+            timeExp_i[step_matching] = new double  [2];
+            timeExpSigma_i[step_matching] = new double  [2];
 
             //массив упрощенных гипотез (2 гипотезы) масс и пдг кодов для них для каждого сметченного трека в ивенте
-            Mass_i[step_matching] = new Double_t [2];
-            Pdg_Code_i[step_matching] = new Int_t [2];
-
+            Mass_i[step_matching] = new double  [2];
+            Pdg_Code_i[step_matching] = new int [2];
 
             //досоздаем двумерный массив для сметченных трэков в выбранном ивенте [i][0] = индекс сметченного трэка, [i][1] = p - импульс сметченного трэка и заполняем его
-            Data_n[step_matching] = new Double_t [6]; 
+            Data_n[step_matching] = new double  [7]; 
             Data_n[step_matching][0] = step_matching;
             Data_n[step_matching][1] = p;
             Data_n[step_matching][2] = PdgCode; // pdgcode
             Data_n[step_matching][3] = 0; // mass_pdg
             Data_n[step_matching][4] = MotherId; // MotherId
             Data_n[step_matching][5] = length;
+            Data_n[step_matching][6] = p_t;
 
             //printf("\n tofmatching# %d; PdgCode: %d; \n", step_matching, PdgCode);
 
@@ -571,7 +578,7 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
  
                if (particle) 
                {             
-               Double_t mass_pdg = particle->Mass();  // particle mass in GeV
+               double  mass_pdg = particle->Mass();  // particle mass in GeV
                Data_n[step_matching][3] = mass_pdg;  // particle mass in GeV
                    
                //printf("\n tofmatching# %d; PdgCode: %d; mass_pdg = %.5f;\n", step_matching, PdgCode, mass_pdg);
@@ -583,8 +590,8 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
 
             //заполянем упрощенный массив гипотез масс
             {
-            Int_t k = 1; 
-            Int_t st = 0;
+            int k = 1; 
+            int st = 0;
             if ( sizePdg_i == sizeM_i )
             {//если sizePdg_i == sizeM_i
 
@@ -655,7 +662,7 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
             }
 
             //уже есть заполяненный упрощенный массив гипотез масс и по нему теперь считаем и заполянем массивы для timeExp_i,timeExpSigma_i,Weight_i
-            for (Int_t k = 0; k < 2; k++) 
+            for (int k = 0; k < 2; k++) 
             {
 
                timeExp_i[step_matching][k] = length*sqrt(p*p + Mass_i[step_matching][k] * Mass_i[step_matching][k])/p/speed_light; // timeExp_i = СУММ(dLk/c/Pk*(Pk^2+Mi^2)^1/2)
@@ -680,7 +687,7 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
         //подсчет t_tof_ev: для начала надо взять двумерный массив для сметченных трэков в выбранном ивенте [i][0] = индекс сметченного трэка, [i][1] = p - импульс, ..., и отсортировать по p, поделить отсортированный массив по имупульсам на интервалы и t_tof_ev для 1 интервала = СУММ(t_tof_ev для 2: t_tof_ev для полследнего)/ (последний - 1) и так для остальных
         qsotr_Data_n(Data_n, 0, (N_tofmatching -1 ) ); //работает
 /*
-        for (Int_t gg = 0; gg < N_tofmatching; gg++)
+        for (int gg = 0; gg < N_tofmatching; gg++)
         {
         cout <<"\n"<< endl;
         cout <<"Array[index][p]: "<<"[index: "<<Data_n[gg][0]<<"]"<<"[p: "<<Data_n[gg][1]<<"], Gev/c"<<";  "<<"[PdgCode: "<<Data_n[gg][2]<<"]"<<";  "<<"[Mass_pdg: " << Data_n[gg][3]<<"], GeV" << ";  " << "[MotherId: " << Data_n[gg][4]<<"]" << ";\n  " << endl;
@@ -689,25 +696,25 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
 
 
         //разбиение сметченых треков по группам, так что бы в каждой было >3 и <=30, интервалы сохраняем в виде индексов от 0 до N_tofmatching в массиве: например 10 треков -> массив[2] = {5, 10}.
-        Int_t *intervals_p;
-        Int_t N_intervals = 0;
+        int *intervals_p;
+        int N_intervals = 0;
         {
-        Int_t h = 20;  
-        Int_t status_arr = 0;
-        Int_t subtrahend = -1;
+        int h = 20;  
+        int status_arr = 0;
+        int subtrahend = -1;
 
         while ( subtrahend < 4 && status_arr == 0 )
         { //начало0
 
         subtrahend = subtrahend + 1;
-        Int_t N_tofmatching_new = N_tofmatching - subtrahend;
+        int N_tofmatching_new = N_tofmatching - subtrahend;
         
         if (N_tofmatching_new % 4 == 0 || N_tofmatching_new % 5 == 0 || N_tofmatching_new % 6 == 0 || N_tofmatching_new % 7 == 0 || N_tofmatching_new % 8  == 0 || N_tofmatching_new % 9 == 0 || N_tofmatching_new % 10  == 0 || N_tofmatching_new % 11 == 0 || N_tofmatching_new % 12 == 0 || N_tofmatching_new % 13 == 0 || N_tofmatching_new % 14 == 0 || N_tofmatching_new % 15 == 0 || N_tofmatching_new % 16 == 0 || N_tofmatching_new % 17 == 0 || N_tofmatching_new % (18 - subtrahend) == 0 || N_tofmatching_new % (19 - subtrahend) == 0 || N_tofmatching_new % (20 - subtrahend) == 0/* || N_tofmatching_new % 21 == 0 || N_tofmatching_new % 22 == 0 || N_tofmatching_new % 23 == 0 || N_tofmatching_new % 24 == 0 || N_tofmatching_new % 25 == 0 || N_tofmatching_new % 26 == 0 || N_tofmatching_new % 27 == 0 || N_tofmatching_new % (28 - subtrahend) == 0 || N_tofmatching_new % (29  - subtrahend) == 0 || N_tofmatching_new % (30 - subtrahend) == 0*/)  
         { //начало1
          while (h > (3 + subtrahend) && status_arr == 0)
          { //начало while
           
-           Int_t h_new = h - subtrahend;
+           int h_new = h - subtrahend;
            if (N_tofmatching_new % h_new == 0)
            {
               //cout << "\nN_intervals: " << N_intervals << ";" << endl;
@@ -717,7 +724,7 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
               //cout << "\nN_intervals = 1 =: " << N_intervals << ";" << endl;
                  if (h_new/2 >= 10)
                  {
-                    intervals_p = new Int_t [3];
+                    intervals_p = new int [3];
                     intervals_p[0] = 0;
                     intervals_p[1] = 10;
                     intervals_p[2] = h_new;
@@ -728,7 +735,7 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
                  }
                  if (h_new/2 >= 8)
                  {
-                    intervals_p = new Int_t [3];
+                    intervals_p = new int [3];
                     intervals_p[0] = 0;
                     intervals_p[1] = 8;
                     intervals_p[2] = h_new;
@@ -739,7 +746,7 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
                  }
                  if (h_new/2 >= 6)
                  {
-                    intervals_p = new Int_t [3];
+                    intervals_p = new int [3];
                     intervals_p[0] = 0;
                     intervals_p[1] = 6;
                     intervals_p[2] = h_new;
@@ -750,7 +757,7 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
                  }
                  if (h_new/2 >= 4)
                  {
-                    intervals_p = new Int_t [3];
+                    intervals_p = new int [3];
                     intervals_p[0] = 0;
                     intervals_p[1] = 4;
                     intervals_p[2] = h_new;
@@ -761,7 +768,7 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
                  }
                  if (h_new/2 < 4) 
                  {                    
-                    intervals_p = new Int_t [2]; 
+                    intervals_p = new int [2]; 
                     intervals_p[0] = 0;
                     intervals_p[1] = h_new;
                     N_intervals = 1;
@@ -773,9 +780,9 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
               else 
               {
                  //cout << "\nN_intervals: " << N_intervals << ";" << endl;
-                 intervals_p = new Int_t [N_intervals + 1];
+                 intervals_p = new int [N_intervals + 1];
                  intervals_p[0] = 0;
-                 for (Int_t j = 0; j < (N_intervals - 1); j++) 
+                 for (int j = 0; j < (N_intervals - 1); j++) 
                  {
                     intervals_p[j+1] = (j+1)*h_new;
                  }
@@ -794,7 +801,7 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
 /*
         printf("\n");
         
-        for (Int_t gg = 0; gg < N_intervals + 1; gg++)
+        for (int gg = 0; gg < N_intervals + 1; gg++)
         {
         cout <<"intervals_p["<< gg << "]: "<< intervals_p[gg]<<";  "<< endl;
         }
@@ -806,36 +813,36 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
         //класс в котором будем хранить t_best_Ev, t_best_Ev_sigma, Xi2 и гипотезу для выбраного интверала
         Result* result_n = new Result[N_intervals];
  
-        Double_t efficiency_hypotez_event = 0;
-        Double_t efficiency_hypotez_event_mod = 0;
-        Double_t num_plug_event = 0;
+        double  efficiency_hypotez_event = 0;
+        double  efficiency_hypotez_event_mod = 0;
+        double  num_plug_event = 0;
         
         //определение TimeTofEv для каждого из ИМПУЛЬСНЫХ интервалов
-        for (Int_t j = 0; j < N_intervals; j++)
+        for (int j = 0; j < N_intervals; j++)
         {
            result_n[j] = Result();
 
-           Double_t Xi2_min = 100000000;
-           Int_t number_elem_interval = intervals_p[j+1] - intervals_p[j];
+           double  Xi2_min = 100000000;
+           int number_elem_interval = intervals_p[j+1] - intervals_p[j];
 
-           Int_t* hipotez = new Int_t [number_elem_interval]; //внутри цикла будем работать с массивом 0 и 1, а сохранять ифнормация о гипотезе будем в виде? "001010111" с помощью некого преобразования
+           int* hipotez = new int [number_elem_interval]; //внутри цикла будем работать с массивом 0 и 1, а сохранять ифнормация о гипотезе будем в виде? "001010111" с помощью некого преобразования
 
-           memset( hipotez, 0, (sizeof(Int_t)*number_elem_interval) );
+           memset( hipotez, 0, (sizeof(int)*number_elem_interval) );
 
-           for (Int_t count = 0; count < pow( 2, number_elem_interval ); count++) //перебор всевозможных комбинация масс для выбранного интервала
+           for (int count = 0; count < pow( 2, number_elem_interval ); count++) //перебор всевозможных комбинация масс для выбранного интервала
            {  
               //printf_hipotez (hipotez, number_elem_interval);
 
-              Double_t time_tof_ev = 0;
-              Double_t Cymm_weight = 0;
-              Double_t time_tof_ev_sigma = 0;
-              Double_t Xi2 = 0;
-              Int_t hh = 0;
+              double  time_tof_ev = 0;
+              double  Cymm_weight = 0;
+              double  time_tof_ev_sigma = 0;
+              double  Xi2 = 0;
+              int hh = 0;
 
-              for (Int_t n_tracks = intervals_p[j]; n_tracks < intervals_p[j+1]; n_tracks++) // 0, 1, 2 , 3, 4;   5, 6, 7, 8, 9
+              for (int n_tracks = intervals_p[j]; n_tracks < intervals_p[j+1]; n_tracks++) // 0, 1, 2 , 3, 4;   5, 6, 7, 8, 9
               {                                                                                                 //0, 1, 2, 3, 4
                  //cout << "..." << n_tracks << endl;
-                 Int_t id_track = Int_t(Data_n[n_tracks][0]); 
+                 int id_track = Int_t(Data_n[n_tracks][0]); 
 
                  time_tof_ev = time_tof_ev + Weight_i[id_track][ hipotez[hh] ] * (time_n[id_track] - timeExp_i[id_track][ hipotez[hh] ]); 
                  Cymm_weight = Cymm_weight + Weight_i[id_track][ hipotez[hh] ];
@@ -848,9 +855,9 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
    
               hh = 0;
 
-              for (Int_t n_tracks = intervals_p[j]; n_tracks < intervals_p[j+1]; n_tracks++)
+              for (int n_tracks = intervals_p[j]; n_tracks < intervals_p[j+1]; n_tracks++)
               { 
-                 Int_t id_track = Int_t(Data_n[n_tracks][0]);
+                 int id_track = Int_t(Data_n[n_tracks][0]);
                  
                  Xi2 = Xi2 + pow( (time_n[id_track] - timeExp_i[id_track][ hipotez[hh] ] - time_tof_ev) , 2) * Weight_i[id_track][ hipotez[hh] ]; 
 
@@ -864,6 +871,10 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
                  result_n[j] = Z;
 
                  Xi2_min = Xi2; 
+
+                 //cout << "Interval: "<< j <<";" << endl;
+                 //printf_hipotez( hipotez, number_elem_interval); //выведем нашу гипотезу
+                 //cout << result_n[j].int_hipotez << endl;
               }
 
               increase_elem_arr (hipotez, number_elem_interval); // каким либо образом приращать гипотезу масс в зависимости от этапа цикла
@@ -876,33 +887,35 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
            h7->Fill(1/sqrt(number_elem_interval), 1000*result_n[j].time_tof_ev_sigma);
 
            // 1 метод оценки эффективности определения сорта частиц
-           Double_t efficiency_hypotez_Xi2min = 0;
-           Double_t efficiency_hypotez_Xi2min_mod = 0;
-           memset( hipotez, 0, (sizeof(Int_t)*number_elem_interval) );
+           double  efficiency_hypotez_Xi2min = 0;
+           double  efficiency_hypotez_Xi2min_mod = 0;
+           memset( hipotez, 0, (sizeof(int)*number_elem_interval) );
+
+           //cout << result_n[j] << endl;
 
            //функция которая int_hipotez(hipotez, number_elem_interval) переведет обратно в одномерный массив hipotez
            (result_n[j]).int_in_hipotez( hipotez ); 
 
            //printf_hipotez( hipotez, number_elem_interval); //выведем нашу гипотезу и посмотрим как мы ее преобразовали
 
-           Int_t hh = 0;
+           int hh = 0;
 
            //система заглушек: для нейтарльных частиц[0], для ионов[1], для фотонов[2]
            int plug[3] = {1, 1, 1}; // 000- включаем все заглушки, если != 000 - выключаем все заглушки
 
-           Int_t num_plug = 0; //кол.во сработавших систем заглушек
+           int num_plug = 0; //кол.во сработавших систем заглушек
 
-           for (Int_t n_tracks = intervals_p[j]; n_tracks < intervals_p[j+1]; n_tracks++)
+           for (int n_tracks = intervals_p[j]; n_tracks < intervals_p[j+1]; n_tracks++)
            {
-              Int_t Track_Index = Int_t(Data_n[n_tracks][0]);
+              int Track_Index = Int_t(Data_n[n_tracks][0]);
 
-              Int_t Pdg_Code = Int_t(Data_n[n_tracks][2]);
-              Double_t Pdg_Mass = Data_n[n_tracks][3];
+              int Pdg_Code = Int_t(Data_n[n_tracks][2]);
+              double  Pdg_Mass = Data_n[n_tracks][3];
 
-              Int_t Hypotez_Pdg = Pdg_Code_i[Track_Index][hipotez[hh]]; 
-              Double_t Hypotez_Mass = Mass_i[Track_Index][hipotez[hh]];
+              int Hypotez_Pdg = Pdg_Code_i[Track_Index][hipotez[hh]];
+              double  Hypotez_Mass = Mass_i[Track_Index][hipotez[hh]];
 
-              Int_t MotherId = Int_t(Data_n[n_tracks][4]);
+              int MotherId = Int_t(Data_n[n_tracks][4]);
 
               // printf("\nIndex interval %d; Pdg_Code = %d; Hypotez_Pdg = %d; Pdg_Mass = %f, GeV; Hypotez_Mass = %f, GeV; \n", j, Pdg_Code, Hypotez_Pdg, Pdg_Mass, Hypotez_Mass);
  
@@ -1006,24 +1019,24 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
         }
  
         //вывод результатов для каждого интервала t_best_Ev, t_best_Ev_sigma, Xi2 и гипотезу, number_elem_interval   
-        //printf_result (result_n, N_intervals);
+        printf_result (result_n, N_intervals);
 
         if (N_intervals > 1)
         {
         // пересчитываем time_tof_ev и time_tof_ev_sigma для каждого интервала | t_TOFev вычисляется для каждого импульсного интервала с использованием только треков, принадлежащих другим импульсным интервалам.
-           Double_t* time_tof_ev = new Double_t[N_intervals]; 
-           Double_t* time_tof_ev_sigma = new Double_t[N_intervals];
-           Double_t* ves = new Double_t[N_intervals];
+           double* time_tof_ev = new Double_t[N_intervals]; 
+           double* time_tof_ev_sigma = new Double_t[N_intervals];
+           double* ves = new Double_t[N_intervals];
 
-           for (Int_t j0 = 0; j0 < N_intervals; j0++)
+           for (int j0 = 0; j0 < N_intervals; j0++)
            {
-              Double_t cymm = 0;
-              Double_t cymm_sigma = 0;
-              Double_t weigh = 0;
+              double  cymm = 0;
+              double  cymm_sigma = 0;
+              double  weigh = 0;
 
-              for (Int_t j1 = 0; j1 < N_intervals; j1++)
+              for (int j1 = 0; j1 < N_intervals; j1++)
               {
-                 Double_t p0 = (1 / result_n[j1].Xi2);
+                 double  p0 = (1 / result_n[j1].Xi2);
                  if ( j1 != j0)
                  {
                     cymm = cymm + (result_n[j1].time_tof_ev * p0);
@@ -1038,11 +1051,11 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
            }
 
            // считаем уже конечные time_best_ev и time_best_ev_sigma для каждого ивента
-           Double_t time_best_ev = 0; 
-           Double_t time_best_ev_sigma = 0;
-           Double_t weigh = 0;
+           double  time_best_ev = 0; 
+           double  time_best_ev_sigma = 0;
+           double  weigh = 0;
 
-           for (Int_t j = 0; j < N_intervals; j++)
+           for (int j = 0; j < N_intervals; j++)
            {
               time_best_ev = time_best_ev + time_tof_ev[j]*(1/ves[j]);
               time_best_ev_sigma = time_best_ev_sigma + time_tof_ev_sigma[j]*(1/ves[j]);
@@ -1073,40 +1086,62 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
               h6->Fill(N_tofmatching, time_best_ev_sigma*1000);
            }
            
-           Double_t eff_nsigma = 0; 
-           Double_t eff_nsigma_event = 0;
+           double  eff_nsigma = 0; 
+           double  eff_nsigma_event = 0;
 
            //определение TimeTofEv для каждого из ИМПУЛЬСНЫХ интервалов
-           for (Int_t j = 0; j < N_intervals; j++)
+           for (int j = 0; j < N_intervals; j++)
            {
-              Int_t number_elem_interval = intervals_p[j+1] - intervals_p[j];
-              Int_t* hipotez = new Int_t [number_elem_interval]; 
-              memset( hipotez, 0, (sizeof(Int_t)*number_elem_interval) );
+              int number_elem_interval = intervals_p[j+1] - intervals_p[j];
+              int* hipotez = new int [number_elem_interval]; 
+              memset( hipotez, 0, (sizeof(int)*number_elem_interval) );
 
               //функция которая int_hipotez(hipotez, number_elem_interval) переведет обратно в одномерный массив hipotez
               (result_n[j]).int_in_hipotez( hipotez );
 
-              Int_t hh = 0;
+              int hh = 0;
 
-              for (Int_t n_tracks = intervals_p[j]; n_tracks < intervals_p[j+1]; n_tracks++)
+              for (int n_tracks = intervals_p[j]; n_tracks < intervals_p[j+1]; n_tracks++)
               {
-                 Int_t Track_Index = Int_t(Data_n[n_tracks][0]);
+                 int Track_Index = Int_t(Data_n[n_tracks][0]);
                  
                  //массивы SigmaPID2_i nSigmaTOF_i
                  SigmaPID2_i[Track_Index] = timeSigma*timeSigma + pow(time_best_ev_sigma, 2) + timeExpSigma_i[Track_Index][hipotez[hh]]*timeExpSigma_i[Track_Index][hipotez[hh]];
                  nSigmaTOF_i[Track_Index] = (time_n[Track_Index] - time_best_ev - timeExp_i[Track_Index][hipotez[hh]]) / sqrt(SigmaPID2_i[Track_Index]);
 
+                 int Pdg_Code = Int_t(Data_n[n_tracks][2]);
+                 double  Pdg_Mass = Data_n[n_tracks][3];
+                 int Hypotez_Pdg = Pdg_Code_i[Track_Index][hipotez[hh]]; 
+                     
+                 if(abs(Pdg_Code) == abs(Hypotez_Pdg) && pdg_pi == abs(Pdg_Code)) //vector<AFP> array_pi;
+                 {
+                    AFP Pi( timeExp_i[Track_Index][hipotez[hh]], sqrt(SigmaPID2_i[Track_Index]), Data_n[n_tracks][6] ); 
+                    array_pi.push_back(Pi);
+                    //cout << "Pi: " << Pi << endl;
+                 }
+
+                 if(abs(Pdg_Code) == abs(Hypotez_Pdg) && pdg_K == abs(Pdg_Code)) //vector<AFP> array_k; 
+                 {
+                    AFP Kaon( timeExp_i[Track_Index][hipotez[hh]], sqrt(SigmaPID2_i[Track_Index]), Data_n[n_tracks][6] ); 
+                    array_k.push_back(Kaon);
+                    //cout << "Kaon: " << Kaon << endl;
+                 }
+
+                 if(abs(Pdg_Code) == abs(Hypotez_Pdg) && pdg_proton == abs(Pdg_Code)) //vector<AFP> array_p;
+                 {
+                    AFP Proton( timeExp_i[Track_Index][hipotez[hh]], sqrt(SigmaPID2_i[Track_Index]), Data_n[n_tracks][6] ); 
+                    array_p.push_back(Proton);   
+                    //cout << "Proton: " << Proton << endl;  
+                 }
+
                  //cout << "N_intervals =" << j << "; SigmaPID2_i[" << Track_Index << "] = " << SigmaPID2_i[Track_Index] << "; nSigmaTOF_i["<< Track_Index << "] = " << nSigmaTOF_i[Track_Index] << endl;
-                 if(abs(nSigmaTOF_i[Track_Index]) < 3)
+                 if(nSigmaTOF_i[Track_Index] > 3)
                  {
                     //cout << "\n nSigmaTOF_i < 3" << endl;
                     eff_nsigma = eff_nsigma + 1;
-                    eff_nsigma_event = eff_nsigma_event + 1;
-
-                    Int_t Pdg_Code = Int_t(Data_n[n_tracks][2]);
-                    Double_t Pdg_Mass = Data_n[n_tracks][3];
-
-                    Double_t M_propagetion_2 = Data_n[n_tracks][1]*Data_n[n_tracks][1]*( (time_n[Track_Index] - time_best_ev)*(time_n[Track_Index] - time_best_ev)*speed_light*speed_light/Data_n[n_tracks][5]/Data_n[n_tracks][5] - 1);
+                    eff_nsigma_event = eff_nsigma_event + 1;                
+/*
+                    double  M_propagetion_2 = Data_n[n_tracks][1]*Data_n[n_tracks][1]*( (time_n[Track_Index] - time_best_ev)*(time_n[Track_Index] - time_best_ev)*speed_light*speed_light/Data_n[n_tracks][5]/Data_n[n_tracks][5] - 1);
 
                     if(M_propagetion_2 > 0)
                     {
@@ -1130,6 +1165,7 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
                           cout << "\n proton, M_prop =" << sqrt(M_propagetion_2) <<"; M_proton =" << M_proton << endl;
                        }
                     }
+*/
                  }
                  hh = hh + 1;
               }
@@ -1224,6 +1260,40 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
     }
     }// end main loop over events
 
+    //для изучения разделительной способности Pi и K нашего метода
+    for (int I = 0; I < array_k.size(); I++)
+    {
+       for (int J = 0; J < array_pi.size(); J++)
+       {
+          double n_sigma_i_j = (array_k[I].t_exp - array_pi[J].t_exp) / array_pi[J].sigma_pid;
+          //cout << "n_sigma_i_j = " << n_sigma_i_j << endl;
+          double proc_p_t = abs(array_k[I].p_t - array_pi[J].p_t)/MAX_2(array_k[I].p_t, array_pi[J].p_t);
+
+          if( n_sigma_i_j > 0 && proc_p_t < 0.05)   
+          {   
+              nsigma_k_pi->Fill(array_k[I].p_t, n_sigma_i_j);
+              //cout << "Pt_K = " << array_k[I].p_t << "; Pt_pi = " << array_pi[J].p_t << "; n_sigma_i_j = " << n_sigma_i_j << endl;
+          }
+       }
+    }
+
+    //для изучения разделительной способности K и p нашего метода
+    for (int I = 0; I < array_p.size(); I++)
+    {
+       for (int J = 0; J < array_k.size(); J++)
+       {
+          double n_sigma_i_j = (array_p[I].t_exp - array_k[J].t_exp) / array_k[J].sigma_pid;
+          //cout << "n_sigma_i_j = " << n_sigma_i_j << endl;
+          double proc_p_t = abs(array_p[I].p_t - array_k[J].p_t)/MAX_2(array_p[I].p_t, array_k[J].p_t);
+
+          if( n_sigma_i_j > 0 && proc_p_t < 0.1)   
+          {   
+              nsigma_p_k->Fill(array_p[I].p_t, n_sigma_i_j);
+              //cout << "Pt_p = " << array_p[I].p_t << "; Pt_K = " << array_k[J].p_t << "; n_sigma_i_j = " << n_sigma_i_j << endl;
+          }
+       }
+    }
+
     //закрываем файл для чтения и записи данных t_ev, t_ev_sigma
     RootFileIn->Close();
     fout.close();
@@ -1261,10 +1331,13 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
 
     h8->Write();
     h9->Write();
-
+/*
     h_pi_nsigma->Write();
     h_k_nsigma->Write();
     h_p_nsigma->Write();
+*/
+    nsigma_k_pi->Write();
+    nsigma_p_k->Write();
 
     //закрываем файл для записи
     RootFileOut->Close();
@@ -1279,8 +1352,8 @@ int read_mpddst_tof_method_t_ev_new(TString inFile = "mpddst_10000.root", TStrin
 
     // -----   Finish   -------------------------------------------------------
     timer.Stop();
-    Double_t rtime = timer.RealTime();
-    Double_t ctime = timer.CpuTime();
+    double  rtime = timer.RealTime();
+    double  ctime = timer.CpuTime();
     cout << endl << endl;
     cout << "Macro finished successfully." << endl; // marker of successful execution
     cout << "Input file is " << inFile << endl;
